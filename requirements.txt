@@ -1,11 +1,11 @@
 # 核心依赖
-streamlit==1.26.0
-scikit-learn==1.3.2
-pandas==2.0.3
-numpy==1.24.4
-joblib==1.3.2
-shap==0.44.1
-matplotlib==3.7.2
+streamlit
+scikit-learn
+pandas
+numpy
+joblib
+shap
+matplotlib
 
 # 可选：指定 Pillow wheel（避免编译）
-pillow==9.5.0 --no-binary :all: --only-binary pillow
+pillow
