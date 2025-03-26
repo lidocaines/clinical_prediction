@@ -16,10 +16,12 @@ from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, roc_curve, 
 model_name = "LDA"
 NUM_FEATURES = 7
 # 新相对路径（相对于 streamlit_app.py）
+#本地端
 #DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
 #importance_file = "./clinical_prediction_app/results_step2_importance/LDA/feature_importance_LDA.csv"
 #MODEL_DIR = "./clinical_prediction_app/models/LDA_7_features/"  # 新增模型目录变量
 #RESULTS_DIR = f"./clinical_prediction_app/"
+#网页客户端
 DATA_PATH = "./mimic_knn.csv"
 importance_file = "./results_step2_importance/LDA/feature_importance_LDA.csv"
 MODEL_DIR = "./models/LDA_7_features/"  # 新增模型目录变量
