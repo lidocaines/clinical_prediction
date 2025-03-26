@@ -1,42 +1,25 @@
-import numpy as np
-import joblib
-import streamlit as st
-import shap
-import pandas as pd
-import os
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, roc_curve, confusion_matrix
-import subprocess
-import sys  # 新增
-
-
-# ==================== 新增：生成依赖文件函数 ====================
-def save_requirements(filename='requirements.txt'):
-    """自动生成项目依赖文件"""
+def filter_requirements(input_file_path, output_file_path):
     try:
-        st.write("正在生成依赖文件...")
+        with open(input_file_path, 'r', encoding='utf-8') as input_file:
+            lines = input_file.readlines()
 
-        # 获取当前环境已安装的包
-        output = subprocess.check_output(
-            [sys.executable, '-m', 'pip', 'freeze'],
-            stderr=subprocess.STDOUT
-        )
-        requirements = output.decode('utf-8').splitlines()
+        # 过滤掉本地编译的包
+        pypi_lines = []
+        for line in lines:
+            if not line.strip().endswith(('.whl', '.egg')) and '@ file:///' not in line:
+                pypi_lines.append(line)
 
-        # 过滤项目相关的核心包（可根据需要增减）
-        core_packages = {
-            'numpy', 'pandas', 'scikit-learn',
-            'streamlit', 'joblib', 'shap',
-            'matplotlib', 'python-dateutil'
-        }
-        filtered = [req for req in requirements if any(pkg in req for pkg in core_packages)]
+        with open(output_file_path, 'w', encoding='utf-8') as output_file:
+            output_file.writelines(pypi_lines)
 
-        # 写入文件
-        with open(filename, 'w') as f:
-            f.write('\n'.join(filtered))
+        print(f"已过滤并保存到 {output_file_path}")
+    except FileNotFoundError:
+        print(f"未找到文件: {input_file_path}")
+    except Exception as e:
+        print(f"发生错误: {e}")
 
-        st.success(f"依赖文件已生成：{os.path.abspath(filename)}")
-        st.markdown("""
+
+if __name__ == "__main__":
+    input_file = 'requirements.txt'
+    output_file = 'requirements_pypi.txt'
+    filter_requirements(input_file, output_file)

@@ -1,11 +1,13 @@
 # clinical_prediction_app.py
+import shap
 import numpy as np
 import joblib
 import streamlit as st
-import shap
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # 新增配置
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
@@ -14,12 +16,15 @@ from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, roc_curve, 
 model_name = "LDA"
 NUM_FEATURES = 7
 # 新相对路径（相对于 streamlit_app.py）
+#DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
+#importance_file = "./clinical_prediction_app/results_step2_importance/LDA/feature_importance_LDA.csv"
+#MODEL_DIR = "./clinical_prediction_app/models/LDA_7_features/"  # 新增模型目录变量
+#RESULTS_DIR = f"./clinical_prediction_app/"
 DATA_PATH = "./mimic_knn.csv"
 importance_file = "./results_step2_importance/LDA/feature_importance_LDA.csv"
 MODEL_DIR = "./models/LDA_7_features/"  # 新增模型目录变量
 RESULTS_DIR = f"./"
 os.makedirs(RESULTS_DIR, exist_ok=True)  # 确保结果目录存在
-
 # 特征配置（根据实际特征调整）
 FEATURE_CONFIG = {
     'age': {'min': 18.0, 'max': 88.0, 'step': 7.0, 'format': '%.0f', 'required': False},
@@ -250,80 +255,70 @@ def main():
             proba = model.predict_proba(scaled_data)[0][1]
             prediction = 1 if proba > 0.5 else 0
 
-            # 显示结果
+            # 预测结果显示（修复缩进错误）
             st.markdown("---")
-            result_container = st.container()
-            with result_container:
+            with st.container():
                 st.subheader("预测结果")
                 if prediction == 1:
                     st.error(f"高风险 (概率: {proba * 100:.1f}%)")
                     st.markdown("""
-                    **临床建议：**
-                    - 立即联系重症监护团队
-                    - 评估血流动力学状态
-                    - 准备CRRT治疗设备
-                    """)
+                     **临床建议：**
+                     - 立即联系重症监护团队
+                     - 评估血流动力学状态
+                     - 准备CRRT治疗设备
+                     """)
                 else:
                     st.success(f"低风险 (概率: {proba * 100:.1f}%)")
                     st.markdown("""
-                    **临床建议：**
-                    - 持续监测生命体征
-                    - 每4小时评估肾功能
-                    - 维持液体平衡
-                    """)
+                     **临床建议：**
+                     - 持续监测生命体征
+                     - 每4小时评估肾功能
+                     - 维持液体平衡
+                     """)
 
-                    # SHAP解释
-                    with st.container():
-                        st.subheader("预测解释")
+            # SHAP可视化（统一执行）
+            with st.container():
+                st.subheader("预测解释")
 
-                        # 初始化解释器
-                        # 在SHAP解释部分可以改为：
-                        try:
-                            explainer = shap.LinearExplainer(model, X_train,
-                            feature_perturbation="interventional")
-                        except:
-                            explainer = shap.KernelExplainer(model.predict_proba, X_train,
-                            feature_perturbation="interventional")
+                try:
+                        explainer = shap.LinearExplainer(model, X_train, feature_perturbation="interventional")
+                except:
+                        explainer = shap.KernelExplainer(model.predict_proba, X_train)
 
-                        # 计算SHAP值
-                        shap_values = explainer.shap_values(scaled_data)
+                    # 计算SHAP值
+                shap_values = explainer.shap_values(scaled_data)
+                    # 直接使用输入的原始值构建特征标签
+                raw_values = [input_values[f] for f in features]  # 从输入表单直接获取原始值
+                    # 创建特征标签（特征名 + 原始输入值）
+                formatted_features = [
+                     f"{name}\n({value:.1f})"  # 示例：age (58.0)
+                      for name, value in zip(features, raw_values)
+                    ]
+                    # 瀑布图
+                st.markdown("#### 瀑布图解释")
+                fig1, ax1 = plt.subplots()
+                shap.plots._waterfall.waterfall_legacy(
+                    explainer.expected_value,
+                    shap_values[0],
+                    feature_names=formatted_features,
+                    max_display=10,
+                    show=False
+                    )
+                st.pyplot(fig1)
+                plt.close(fig1)  # 重要：释放图形资源
 
-                        # 瀑布图
-                        st.markdown("#### 瀑布图解释")
-                        fig1, ax1 = plt.subplots()
-                        shap.plots._waterfall.waterfall_legacy(
-                            explainer.expected_value,
-                            shap_values[0],
-                            feature_names=features,
-                            max_display=10,
-                            show=False
-                        )
-                        st.pyplot(fig1)
+                # 决策图
+                st.markdown("#### 决策过程图")
+                fig3, ax3 = plt.subplots()
+                shap.decision_plot(
+                    explainer.expected_value,
+                    shap_values,
+                    features,
+                    feature_order='importance',
+                    show=False
+                )
+                st.pyplot(fig3)
 
-                        # 力图
-                        st.markdown("#### 特征贡献力图")
-                        fig2, ax2 = plt.subplots()
-                        shap.force_plot(
-                            explainer.expected_value,
-                            shap_values[0],
-                            input_data.iloc[0],
-                            matplotlib=True,
-                            show=False,
-                            text_rotation=15
-                        )
-                        st.pyplot(fig2)
-
-                        # 决策图
-                        st.markdown("#### 决策过程图")
-                        fig3, ax3 = plt.subplots()
-                        shap.decision_plot(
-                            explainer.expected_value,
-                            shap_values,
-                            features,
-                            feature_order='importance',
-                            show=False
-                        )
-                        st.pyplot(fig3)
         except Exception as e:
             st.error(f"预测失败：{str(e)}")
 
@@ -336,3 +331,6 @@ if __name__ == "__main__":
 
     # 运行应用
     main()
+
+
+
