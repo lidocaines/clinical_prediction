@@ -14,7 +14,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, roc_curve, confusion_matrix
 # ==================== 全局配置 ====================
 model_name = "LDA"
-NUM_FEATURES = 7
+NUM_FEATURES = 18
 # 新相对路径（相对于 streamlit_app.py）
 #本地端
 #DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
