@@ -6,6 +6,7 @@ numpy
 joblib
 shap
 matplotlib
-
+lightgbm
+xgboost
 # 可选：指定 Pillow wheel（避免编译）
 pillow

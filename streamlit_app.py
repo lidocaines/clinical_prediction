@@ -15,7 +15,7 @@ from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier, Ran
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
-
+import lightgbm as lgb
 import xgboost as xgb
 
 # ==================== 全局配置 ====================
@@ -194,7 +194,7 @@ def main():
                     if isinstance(model, (LDA, LogisticRegression)):
                         explainer = shap.LinearExplainer(model, X_train, feature_perturbation="interventional")
                     elif isinstance(model, (RandomForestClassifier, GradientBoostingClassifier,
-                                            xgb.XGBClassifier)):
+                                            xgb.XGBClassifier, lgb.LGBMClassifier)):
                         explainer = shap.TreeExplainer(model)
                     else:
                         explainer = shap.KernelExplainer(model.predict_proba, X_train)
