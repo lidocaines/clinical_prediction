@@ -26,13 +26,13 @@ NUM_FEATURES = 8  # 特征数量
 
 # 新相对路径（相对于 streamlit_app.py）
 #本地运行网页
-RESULTS_DIR = f"./clinical_prediction_app/"
-DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
-importance_file = f"./clinical_prediction_app/results_step2_importance/{model_name}/feature_importance_{model_name}.csv"
+#RESULTS_DIR = f"./clinical_prediction_app/"
+#DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
+#importance_file = f"./clinical_prediction_app/results_step2_importance/{model_name}/feature_importance_{model_name}.csv"
 #网页客户端
-#RESULTS_DIR = f"./"
-#DATA_PATH = "./mimic_knn.csv"
-#importance_file =f"./results_step2_importance/{model_name}/feature_importance_{model_name}.csv"
+RESULTS_DIR = f"./"
+DATA_PATH = "./mimic_knn.csv"
+importance_file =f"./results_step2_importance/{model_name}/feature_importance_{model_name}.csv"
 os.makedirs(RESULTS_DIR, exist_ok=True)  # 确保结果目录存在
 
 # 特征配置（根据实际特征调整）
