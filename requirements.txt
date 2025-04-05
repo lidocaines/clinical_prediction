@@ -6,8 +6,8 @@ numpy
 joblib
 shap
 matplotlib
-lightgbm==4.1.0 --no-binary lightgbm  # 强制源码编译
-xgboost==2.0.3
+lightgbm
+xgboost
 # 可选：指定 Pillow wheel（避免编译）
 pillow
 
