@@ -1,9 +1,10 @@
 feature
 creatinine_max
-lactate_max
-sofa
 aki_stage
-rdw_max
-spo2_min
 urineoutput
-mbp_min
+sofa
+lactate_max
+potassium_max
+platelets_min
+rdw_max
+pao2fio2ratio_min
