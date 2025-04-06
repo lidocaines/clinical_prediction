@@ -1,13 +1,14 @@
 # 核心依赖
-streamlit
-scikit-learn
-pandas
-numpy
-joblib
-shap
-matplotlib
-lightgbm
-xgboost
-# 可选：指定 Pillow wheel（避免编译）
-pillow
+streamlit==1.23.1
+scikit-learn==1.2.2
+pandas==1.5.3
+numpy==1.23.5
+joblib==1.4.2
+shap==0.41.0
+matplotlib==3.7.1
+lightgbm==3.3.5
+xgboost==1.7.3
+pillow==9.5.0
 
+# 添加隐藏依赖
+threadpoolctl==3.6.0
