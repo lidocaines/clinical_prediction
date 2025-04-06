@@ -17,7 +17,7 @@ import lightgbm as lgb
 import xgboost as xgb
 
 # ==================== 全局配置 ====================
-model_name = "Gradient_Boosting"  # 切换模型名称
+model_name = "LDA"  # 切换模型名称
 NUM_FEATURES = 8  # 特征数量
 
 # 新相对路径（相对于 streamlit_app.py）

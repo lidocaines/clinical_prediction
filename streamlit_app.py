@@ -19,20 +19,16 @@ import lightgbm as lgb
 import xgboost as xgb
 
 # ==================== 全局配置 ====================
-model_name = "Gradient_Boosting"  # 切换模型名称
-NUM_FEATURES = 8  # 特征数量
-
-
 
 # 新相对路径（相对于 streamlit_app.py）
 #本地运行网页
 #RESULTS_DIR = f"./clinical_prediction_app/"
 #DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
-#importance_file = f"./clinical_prediction_app/results_step2_importance/{model_name}/feature_importance_{model_name}.csv"
 #网页客户端
 RESULTS_DIR = f"./"
 DATA_PATH = "./mimic_knn.csv"
-importance_file =f"./results_step2_importance/{model_name}/feature_importance_{model_name}.csv"
+
+
 os.makedirs(RESULTS_DIR, exist_ok=True)  # 确保结果目录存在
 
 # 特征配置（根据实际特征调整）
@@ -40,7 +36,7 @@ FEATURE_CONFIG = {
     'age': {'min': 18.0, 'max': 88.0, 'step': 7.0, 'format': '%.0f', 'required': False},
     'weight': {'min': 30.0, 'max': 150.0, 'step': 10.0, 'format': '%.0f', 'required': False},
     'sofa': {'min': 0.0, 'max': 24.0, 'step': 2.0, 'format': '%.0f', 'required': False},
-    'creatinine_max': {'min': 0.0, 'max': 100.0, 'step': 10.0, 'format': '%.1f', 'required': False},
+    'creatinine_max': {'min': 0.0, 'max': 20.0, 'step': 2.0, 'format': '%.1f', 'required': False},
     'lactate_max': {'min': 0.0, 'max': 20.0, 'step': 2.0, 'format': '%.1f', 'required': False},
     'urineoutput': {'min': 0, 'max': 4000, 'step': 500, 'format': '%.0f', 'required': False},
     'temperature_min': {'min': 34.0, 'max': 42.0, 'step': 1.0, 'format': '%.1f', 'required': False},
