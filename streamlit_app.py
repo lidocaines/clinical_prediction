@@ -22,11 +22,11 @@ import xgboost as xgb
 
 # 新相对路径（相对于 streamlit_app.py）
 #本地运行网页
-RESULTS_DIR = f"./clinical_prediction_app/"
-DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
+#RESULTS_DIR = f"./clinical_prediction_app/"
+#DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
 #网页客户端
-#RESULTS_DIR = f"./"
-#DATA_PATH = "./mimic_knn.csv"
+RESULTS_DIR = f"./"
+DATA_PATH = "./mimic_knn.csv"
 
 
 os.makedirs(RESULTS_DIR, exist_ok=True)  # 确保结果目录存在
