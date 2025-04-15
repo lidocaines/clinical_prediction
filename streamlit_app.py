@@ -22,39 +22,45 @@ import xgboost as xgb
 
 # 新相对路径（相对于 streamlit_app.py）
 #本地运行网页
-#RESULTS_DIR = f"./clinical_prediction_app/"
-#DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
+RESULTS_DIR = f"./clinical_prediction_app/"
+DATA_PATH = "./clinical_prediction_app/mimic_knn.csv"
 #网页客户端
-RESULTS_DIR = f"./"
-DATA_PATH = "./mimic_knn.csv"
+#RESULTS_DIR = f"./"
+#DATA_PATH = "./mimic_knn.csv"
 
 
 os.makedirs(RESULTS_DIR, exist_ok=True)  # 确保结果目录存在
 
 # 特征配置（根据实际特征调整）
 FEATURE_CONFIG = {
-    'age': {'min': 18.0, 'max': 88.0, 'step': 7.0, 'format': '%.0f', 'required': False},
-    'weight': {'min': 30.0, 'max': 150.0, 'step': 10.0, 'format': '%.0f', 'required': False},
-    'sofa': {'min': 0.0, 'max': 24.0, 'step': 2.0, 'format': '%.0f', 'required': False},
-    'creatinine_max': {'min': 0.0, 'max': 20.0, 'step': 2.0, 'format': '%.1f', 'required': False},
-    'lactate_max': {'min': 0.0, 'max': 20.0, 'step': 2.0, 'format': '%.1f', 'required': False},
-    'urineoutput': {'min': 0, 'max': 4000, 'step': 500, 'format': '%.0f', 'required': False},
-    'temperature_min': {'min': 34.0, 'max': 42.0, 'step': 1.0, 'format': '%.1f', 'required': False},
-    'rdw_max': {'min': 10.0, 'max': 45.0, 'step': 5.0, 'format': '%.0f', 'required': False},
-    'spo2_min': {'min': 50.0, 'max': 100.0, 'step': 10.0, 'format': '%.0f', 'required': False},
-    'pao2fio2ratio_min': {'min': 20, 'max': 500, 'step': 10.0, 'format': '%.1f', 'required': False},
-    'aki_stage': {'min': 0.0, 'max': 3.0, 'step': 1.0, 'format': '%.0f', 'required': False},
-    'mbp_min': {'min': 40.0, 'max': 120.0, 'step': 5.0, 'format': '%.0f', 'required': False},
-    'mchc_min': {'min': 20.0, 'max': 40.0, 'step': 0.5, 'format': '%.1f', 'required': False},
-    'potassium_max': {'min': 2.0, 'max': 7.0, 'step': 0.5, 'format': '%.1f', 'required': False},
-    'bmi': {'min': 10.0, 'max': 50.0, 'step': 1.0, 'format': '%.1f', 'required': False},
-    'platelets_min': {'min': 0.0, 'max': 500.0, 'step': 50.0, 'format': '%.0f', 'required': False},
-    'gender': {'min': 0, 'max': 1, 'step': 1, 'format': '%.0f', 'required': False},
-    'height': {'min': 60.0, 'max': 240.0, 'step': 10.0, 'format': '%.0f', 'required': False},
-    'po2_min': {'min': 20.0, 'max': 400.0, 'step': 20.0, 'format': '%.0f', 'required': False},
-    'hemoglobin_min': {'min': 5.0, 'max': 20.0, 'step': 1.0, 'format': '%.1f', 'required': False},
-    'ph_min': {'min': 6.8, 'max': 7.8, 'step': 0.1, 'format': '%.1f', 'required': False},
-    'ph_max': {'min': 6.8, 'max': 7.8, 'step': 0.1, 'format': '%.1f', 'required': False},
+    'age':    {'min': 18, 'max': 88, 'step': 1, 'format': '%d', 'default': 50, 'required': False},  # 正常成年人年龄
+    'sofa':   {'min': 0, 'max': 24, 'step': 1, 'format': '%d', 'default': 0, 'required': False},    # 正常SOFA评分0分
+    'urineoutput': {'min': 0, 'max': 4000, 'step': 100, 'format': '%d', 'default': 1500, 'required': False},  # 正常尿量1500ml/天
+    'aki_stage': {'min': 0, 'max': 3, 'step': 1, 'format': '%d', 'default': 0, 'required': False},  # 默认无AKI
+    'gender': {'min': 0, 'max': 1, 'step': 1, 'format': '%d', 'default': 0, 'required': False},     # 0-女 1-男
+    # 肾功能指标
+    'creatinine_max': {'min': 0.0, 'max': 20.0, 'step': 0.1, 'format': '%.1f', 'default': 0.8, 'required': False},  # 正常肌酐(女0.5-1.1,男0.6-1.2)
+    # 代谢指标
+    'lactate_max': {'min': 0.0, 'max': 20.0, 'step': 0.5, 'format': '%.1f', 'default': 1.5, 'required': False},     # 正常乳酸0.5-2.2mmol/L
+    # 生命体征
+    'temperature_min': {'min': 34.0, 'max': 42.0, 'step': 0.1, 'format': '%.1f', 'default': 36.5, 'required': False}, # 正常体温36.5-37.2℃
+    'mbp_min': {'min': 40.0, 'max': 120.0, 'step': 1.0, 'format': '%.1f', 'default': 85.0, 'required': False},      # 正常平均动脉压70-105mmHg
+    'spo2_min': {'min': 50.0, 'max': 100.0, 'step': 1.0, 'format': '%.1f', 'default': 98.0, 'required': False},     # 正常血氧饱和度95-100%
+    # 血气分析
+    'ph_min': {'min': 6.00, 'max': 8.00, 'step': 0.1, 'format': '%.2f', 'default': 7.40, 'required': False},          # 正常pH7.35-7.45
+    'po2_min': {'min': 20.0, 'max': 400.0, 'step': 10.0, 'format': '%.1f', 'default': 80.0, 'required': False},     # 正常PaO2 80-100mmHg
+    # 血液指标
+    'hemoglobin_min': {'min': 5.0, 'max': 20.0, 'step': 1.0, 'format': '%.1f', 'default': 12.0, 'required': False}, # 正常Hb(女12-16g/dL)
+    'platelets_min': {'min': 0.0, 'max': 400.0, 'step': 10.0, 'format': '%.1f', 'default': 200.0, 'required': False}, # 正常血小板150-400×10^9/L
+    # 其他指标
+    'weight': {'min': 30.0, 'max': 150.0, 'step': 1.0, 'format': '%.1f', 'default': 65.0, 'required': False},       # 正常体重示例
+    'height': {'min': 60.0, 'max': 240.0, 'step': 1.0, 'format': '%.1f', 'default': 170.0, 'required': False},      # 正常身高示例
+    'bmi': {'min': 10.0, 'max': 50.0, 'step': 0.1, 'format': '%.1f', 'default': 22.5, 'required': False},          # 正常BMI18.5-24.9
+    # 特殊配置
+    'pao2fio2ratio_min': {'min': 20, 'max': 500, 'step': 10.0, 'format': '%.1f', 'default': 300.0, 'required': False}, # 正常>300
+    'rdw_max': {'min': 10.0, 'max': 45.0, 'step': 0.5, 'format': '%.1f', 'default': 13.0, 'required': False},       # 正常RDW11-14%
+    'potassium_max': {'min': 0.0, 'max': 10.0, 'step': 0.1, 'format': '%.1f', 'default': 4.0, 'required': False},   # 正常血钾3.5-5.0mmol/L
+    'mchc_min': {'min': 20.0, 'max': 40.0, 'step': 0.1, 'format': '%.1f', 'default': 33.0, 'required': False},      # 正常MCHC32-36g/dL
 }
 
 
@@ -64,76 +70,37 @@ def generate_inputs(features):
     """根据特征动态生成输入表单"""
     input_values = {}
 
-    # 核心参数
+    # 参数输入区域
     with st.container():
-        st.header("Key Parameters")
-        cols = st.columns(2)
-        main_features = [f for f in features if FEATURE_CONFIG[f]['required']]
+        st.header("Key Parameters")  # 统一标题
+        cols = st.columns(2)  # 两列布局
 
-        for i, feat in enumerate(main_features):
-            with cols[i % 2]:
+        for i, feat in enumerate(features):
+            with cols[i % 2]:  # 交替分配参数到左、右两列
                 cfg = FEATURE_CONFIG[feat]
-                # 统一数值类型
-                min_val = cfg['min']
-                max_val = cfg['max']
-                step_val = cfg['step']
-                default_val = (min_val + max_val) / 2
 
-                # 在generate_inputs函数中统一修改
-                if '%.0f' in cfg['format']:
+                # 检查是否为整数格式
+                if cfg['format'] == '%d':  # 直接匹配%d
+                    input_values[feat] = st.number_input(
+                        label=feat,
+                        min_value=int(cfg['min']),
+                        max_value=int(cfg['max']),
+                        value=cfg.get('default', int((cfg['min'] + cfg['max']) // 2)),
+                        step=int(cfg['step']),
+                        format=cfg['format']  # 现在为%d
+                    )
+                else:
+                    # 处理浮点数
                     input_values[feat] = st.number_input(
                         label=feat,
                         min_value=float(cfg['min']),
                         max_value=float(cfg['max']),
-                        value=float((cfg['min'] + cfg['max']) / 2),
+                        value=cfg.get('default', float((cfg['min'] + cfg['max']) / 2) ),
                         step=float(cfg['step']),
                         format=cfg['format']
                     )
-                else:
-                    # 原有浮点数处理逻辑
-                    input_values[feat] = st.number_input(
-                        label=feat,
-                        min_value=float(min_val),
-                        max_value=float(max_val),
-                        value=float(default_val),
-                        step=float(step_val),
-                        format=cfg['format']
-                    )
 
-        # 高级参数 (修改方式同上)
-        with st.expander("高级参数"):
-            adv_features = [f for f in features if not FEATURE_CONFIG[f]['required']]
-            cols = st.columns(2)
-
-            for i, feat in enumerate(adv_features):
-                with cols[i % 2]:
-                    cfg = FEATURE_CONFIG[feat]
-                    min_val = cfg['min']
-                    max_val = cfg['max']
-                    step_val = cfg['step']
-                    default_val = (min_val + max_val) / 2
-
-                    if '%.0f' in cfg['format']:
-                        input_values[feat] = st.number_input(
-                            label=feat,
-                            min_value=int(min_val),
-                            max_value=int(max_val),
-                            value=int(default_val),
-                            step=int(step_val),
-                            format=cfg['format']
-                        )
-                    else:
-                        input_values[feat] = st.number_input(
-                            label=feat,
-                            min_value=float(min_val),
-                            max_value=float(max_val),
-                            value=float(default_val),
-                            step=float(step_val),
-                            format=cfg['format']
-                        )
-
-        return input_values
-
+    return input_values
 
 # ==================== Streamlit界面 ====================
 def main():
